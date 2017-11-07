@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "790620264294",
+    "firebase_url": "https://happyhourapp-f6e9c.firebaseio.com",
+    "project_id": "happyhourapp-f6e9c",
+    "storage_bucket": "happyhourapp-f6e9c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:790620264294:android:9cacea13982a6df0",
+        "android_client_info": {
+          "package_name": "com.to426project.happyhourapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "790620264294-pnaflipjqkqupssr4cddnfec2r5o6j1c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.to426project.happyhourapp",
+            "certificate_hash": "45739871be2cb6d4588e954bb5db9e4c848241e7"
+          }
+        },
+        {
+          "client_id": "790620264294-ojqov4ssp1296e35hcrogj1u7fcuehan.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuhr24dQiWtP1sS4TqDVOjjHJLXzyXYfo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "790620264294-ojqov4ssp1296e35hcrogj1u7fcuehan.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

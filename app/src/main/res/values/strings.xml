@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">HappyHourApp</string>
+    <string name="title_activity_list">ActivityList</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="title_activity_favorites">ActivityFavorites</string>
+    <string name="title_activity_events">ActivityEvents</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

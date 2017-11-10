@@ -2,6 +2,7 @@ package com.to426project.happyhourapp;
 
 import android.location.Location;
 import android.media.tv.TvContract;
+import android.support.design.widget.CoordinatorLayout;
 
 import java.util.jar.Attributes;
 
@@ -11,16 +12,37 @@ import java.util.jar.Attributes;
 
 public class BarRestaurant {
 
-   /* Name                        String
-    Location                    Coordinates
-    Happy Hour start            Time format
-    Happy Hour end              Time format
-    Type of drinks              Multi-select Picklist
-    Type of food                Multi-select Picklist
-    Phone number                numeric
-    Description                 max 310 characters
-    User owned/editable listing boolean
-    Owner                       none or user
-    Logo                        Image */
+    public String Name;
+    public String Location;
+    public String HappyHourStart;
+    public String HappyHourEnd;
+    public String TypeDrink;
+    public String TypeFood;
+    public String Owner;
+    public String Description;
+    public int Phone;
+    public boolean BusinessUser;
+    public String Logo;
+
+    public BarRestaurant(){
+
+    }
+
+    public BarRestaurant(String Name, String Location, String HappyHourStart, String HappyHourEnd, String TypeDrink,
+                         String TypeFood, String Owner, String Description, int Phone, boolean BusinessUser, String Logo){
+
+        this.Name = Name;
+        this.Location = Location;
+        this.HappyHourStart = HappyHourStart;
+        this.HappyHourEnd = HappyHourEnd;
+        this.TypeDrink = TypeDrink;
+        this.TypeFood = TypeFood;
+        this.Owner = Owner;
+        this.Description = Description;
+        this.Phone = Phone;
+        this.BusinessUser = BusinessUser;
+        this.Logo = Logo;
+
+    }
 
 }

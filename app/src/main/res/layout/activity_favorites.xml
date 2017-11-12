@@ -14,14 +14,9 @@
         android:layout_height="wrap_content"
         android:text="@string/title_home"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="16dp" />
+        tools:layout_editor_absoluteY="16dp"
+        tools:ignore="MissingConstraints" />
 
-    <android.support.design.widget.BottomNavigationView
-        android:id="@+id/navigation"
-        android:layout_width="384dp"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
-        app:menu="@menu/navigation"
-        tools:layout_editor_absoluteY="519dp" />
+
 
 </android.support.constraint.ConstraintLayout>

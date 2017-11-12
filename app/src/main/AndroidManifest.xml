@@ -49,7 +49,8 @@
         <activity
             android:name=".ActivityMaps"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".ActivityFilter"></activity>
+        <activity android:name=".ActivityFilter" />
+        <activity android:name=".ActivitySignUp"></activity>
     </application>
 
 </manifest>

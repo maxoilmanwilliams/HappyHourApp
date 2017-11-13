@@ -7,7 +7,6 @@ package com.to426project.happyhourapp;
 public class User {
 
     public String Email;
-    public String Password;
     public String UID;
     public String Name;
     public String Type;
@@ -17,15 +16,15 @@ public class User {
     public int Age;
     public int Level;
 
+
     public User(){
 
     }
 
-    public User(String Email, String Password, String UID, String Name, String Type, String Favorite,
+    public User(String Email, String UID, String Name, String Type, String Favorite,
                 String Location, String Gender, int Age, int Level) {
 
         this.Email = Email;
-        this.Password = Password;
         this.UID = UID;
         this.Name = Name;
         this.Type = Type;

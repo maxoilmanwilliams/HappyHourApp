@@ -113,7 +113,7 @@ public class ActivitySignUp extends Activity implements View.OnClickListener {
     }
 
     public void writeNewUser(String uid, String email, String password, String name, Integer age) {
-        User newUser = new User(email, password, uid, name, "", "", "", "", age, 0);
+        User newUser = new User(email, uid, name, "", "", "", "", age, 0);
         final Intent logInSuccessIntent = new Intent(this , MainActivity.class);
 
         mDatabase.child("user").child(uid).setValue(newUser)

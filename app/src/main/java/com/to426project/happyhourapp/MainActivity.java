@@ -130,8 +130,8 @@ public class MainActivity extends Activity implements OnClickListener {
         }
         else if (view == buttonSignUp){
 
-            createAccount( mUsername , mPassword);
-
+            Intent intent = new Intent(this , ActivitySignUp.class);
+            startActivity(intent);
         }
 
     }

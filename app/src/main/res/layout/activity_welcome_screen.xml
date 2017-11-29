@@ -9,17 +9,17 @@
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomBar" >
+        android:layout_above="@+id/bottomBar">
 
     </FrameLayout>
+
     <com.roughike.bottombar.BottomBar
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        app:bb_tabXmlResource="@xml/bottombar_tabs"
         app:bb_behavior="underNavbar"
-    />
+        app:bb_tabXmlResource="@xml/bottombar_tabs" />
 
     <TextView
         android:id="@+id/textViewWelcome"
@@ -32,4 +32,31 @@
         android:gravity="center_horizontal"
         android:text="Welcome Screen"
         android:textStyle="bold" />
+
+    <ImageButton
+        android:id="@+id/imageButtonNavigation"
+        style="@android:style/Widget.DeviceDefault.ImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/editTextLocationBox"
+        android:layout_marginLeft="18dp"
+        android:layout_marginStart="18dp"
+        android:layout_toEndOf="@+id/editTextLocationBox"
+        android:layout_toRightOf="@+id/editTextLocationBox"
+        android:src="@drawable/ic_nearby" />
+
+    <EditText
+        android:id="@+id/editTextLocationBox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textViewWelcome"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="43dp"
+        android:layout_marginLeft="21dp"
+        android:layout_marginStart="21dp"
+        android:ems="10"
+        android:hint="Enter Location"
+        android:inputType="textPostalAddress" />
+
 </RelativeLayout>

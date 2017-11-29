@@ -20,7 +20,7 @@ public class BarRestaurant {
     public String TypeFood;
     public String Owner;
     public String Description;
-    public int Phone;
+    public String Phone;
     public boolean BusinessUser;
     public String Logo;
 
@@ -29,7 +29,7 @@ public class BarRestaurant {
     }
 
     public BarRestaurant(String Name, String Location, String HappyHourStart, String HappyHourEnd, String TypeDrink,
-                         String TypeFood, String Owner, String Description, int Phone, boolean BusinessUser, String Logo){
+                         String TypeFood, String Owner, String Description, String Phone, boolean BusinessUser, String Logo){
 
         this.Name = Name;
         this.Location = Location;

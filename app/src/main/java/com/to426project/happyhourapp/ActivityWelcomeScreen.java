@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 
+//import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.roughike.bottombar.BottomBar;
@@ -26,6 +27,7 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
     private FirebaseAuth.AuthStateListener mAuthListener;
     private static final String TAG = "ActivityWelcomeScreen";
 
+    //private FusedLocationProviderClient mFusedLocationClient;
 
     //private Button buttonGetLocation;
     private ImageButton imageButtonGetLocation;
@@ -52,6 +54,11 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
             Intent intentMaps = new Intent(this, ActivityMaps.class);
             this.startActivity(intentMaps);
         }
+        else if (item.getItemId()==R.id.itemAddBar){
+            Intent intentAddBar = new Intent(this, ActivityAddBar.class);
+            this.startActivity(intentAddBar);
+
+        }
         else if (item.getItemId()==R.id.itemLogOut ){
             mAuth.signOut();
             Intent intentLogIn = new Intent(this, MainActivity.class);
@@ -65,22 +72,30 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
 
-        //final Intent intentHome = new Intent(this, ActivityEvents.class);
-        final Intent intentFavorites = new Intent(this, ActivityFavorites.class);
-        final Intent intentNearby = new Intent(this, ActivityList.class);
-        final Intent intentMaps = new Intent(this, ActivityMaps.class);
-        final Intent intentList = new Intent(this, ActivityList.class);
-
         imageButtonGetLocation = (ImageButton) findViewById(R.id.imageButtonNavigation) ;
         imageButtonGetLocation.setOnClickListener(this);
 
+        //Firebase
         mAuth = FirebaseAuth.getInstance();
+
+
+        //Intents for Bottom Bar
+        final Intent intentFavorites = new Intent(this, ActivityFavorites.class);
+        //final Intent intentNearby = new Intent(this, ActivityList.class);
+        final Intent intentEvent = new Intent(this, ActivityEvents.class);
+        final Intent intentMaps = new Intent(this, ActivityMaps.class);
+        final Intent intentList = new Intent(this, ActivityList.class);
+
+
+
+
 
         BottomBar bottomBar = (BottomBar) findViewById(R.id.bottomBar);
         bottomBar.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelected(@IdRes int tabId) {
                 if (tabId == R.id.tab_nearby) {
+
                     //startActivity(intentMaps);
                     // The tab with id R.id.tab_favorites was selected,
                     // change your content accordingly.
@@ -90,8 +105,8 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
                 else if (tabId == R.id.tab_favorites){
                     startActivity(intentFavorites);
                 }
-                else if (tabId == R.id.tab_nearby){
-                    startActivity(intentNearby);
+                else if (tabId == R.id.tab_event){
+                    startActivity(intentEvent);
                 }
             }
         });
@@ -110,6 +125,8 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
                 }
             }
         };
+
+
     }
     @Override
     public void onStart() {

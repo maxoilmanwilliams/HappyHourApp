@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <EditText
+        android:id="@+id/editTextBusinessName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Business Name" />
+
+    <EditText
+        android:id="@+id/editTextLocation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Location" />
+
+    <EditText
+        android:id="@+id/editTextHappyHourStart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Happy Hour Start"
+         />
+
+    <EditText
+        android:id="@+id/editTextHappyHourEnd"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Happy Hour End"
+        />
+    <EditText
+        android:id="@+id/editTextFoodType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Food Type"
+        />
+    <EditText
+        android:id="@+id/editTextDrinkType"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Drink Type"
+        />
+    <EditText
+        android:id="@+id/editTextPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Phone"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/buttonCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cancel" />
+
+        <Button
+            android:id="@+id/buttonSubmit"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Submit" />
+    </LinearLayout>
+</LinearLayout>

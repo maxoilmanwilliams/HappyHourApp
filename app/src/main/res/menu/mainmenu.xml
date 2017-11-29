@@ -11,6 +11,9 @@
         android:id="@+id/itemFavorites"
         android:title="Favorites" />
     <item
+        android:id="@+id/itemAddBar"
+        android:title="Add Business" />
+    <item
         android:id="@+id/itemLogOut"
         android:title="Log Out" />
 </menu>

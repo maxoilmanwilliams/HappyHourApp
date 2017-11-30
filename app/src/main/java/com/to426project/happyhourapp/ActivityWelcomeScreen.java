@@ -2,6 +2,7 @@ package com.to426project.happyhourapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
@@ -13,21 +14,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
+import android.widget.Toast;
 
-//import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
 
+import java.util.Locale;
 
 
 public class ActivityWelcomeScreen extends Activity implements View.OnClickListener {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseUser mUser;
     private static final String TAG = "ActivityWelcomeScreen";
 
-    //private FusedLocationProviderClient mFusedLocationClient;
+    private TextView mLocationOutput;
+
+    private FusedLocationProviderClient mFusedLocationClient;
+    protected Location mLastLocation;
+
 
     //private Button buttonGetLocation;
     private ImageButton imageButtonGetLocation;
@@ -72,12 +84,16 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
 
+        mLocationOutput= (TextView) findViewById(R.id.textViewWelcome);
+
         imageButtonGetLocation = (ImageButton) findViewById(R.id.imageButtonNavigation) ;
         imageButtonGetLocation.setOnClickListener(this);
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
 
+        //Location Intitialize
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         //Intents for Bottom Bar
         final Intent intentFavorites = new Intent(this, ActivityFavorites.class);
@@ -117,6 +133,7 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if(user!=null){
                     //user signed in
+                    mLocationOutput.setText(user.getDisplayName());
                     Log.d(TAG, "onAuthStateChanged:signed_in" + user.getUid());
                 } else{
                     //user signed out
@@ -146,8 +163,25 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
     @Override
     public void onClick(View view) {
         if (view == imageButtonGetLocation){
-
+            getLastLocation();
         }
 
     }
+    @SuppressWarnings("MissingPermission")
+    private void getLastLocation(){
+        mFusedLocationClient.getLastLocation()
+                .addOnCompleteListener(this, new OnCompleteListener<Location>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Location> task) {
+                        if(task.isSuccessful() && task.getResult() !=null){
+                            mLastLocation = task.getResult();
+                            mLocationOutput.setText(String.format(Locale.ENGLISH, "%s: %f", "Output:",  mLastLocation.getLatitude()));
+                        }else {
+                            Log.w(TAG, "getLastLocation:exception", task.getException());
+                            Toast.makeText(ActivityWelcomeScreen.this, "Location Not Found", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
 }

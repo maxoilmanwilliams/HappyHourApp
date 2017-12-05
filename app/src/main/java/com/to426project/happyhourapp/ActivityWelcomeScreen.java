@@ -3,15 +3,19 @@ package com.to426project.happyhourapp;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.os.ResultReceiver;
+
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -40,7 +44,6 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
     private FirebaseAuth.AuthStateListener mAuthListener;
     private FirebaseUser mUser;
     private static final String TAG = "ActivityWelcomeScreen";
-    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
     private TextView mLocationOutput;
 
@@ -51,6 +54,26 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
     //private Button buttonGetLocation;
     private ImageButton imageButtonGetLocation;
 
+
+    private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+
+    private static final String ADDRESS_REQUESTED_KEY = "address-request-pending";
+    private static final String LOCATION_ADDRESS_KEY = "location-address";
+    /**
+     * Tracks whether the user has requested an address. Becomes true when the user requests an
+     * address and false when the address (or an error message) is delivered.
+     */
+    private boolean mAddressRequested;
+
+    /**
+     * The formatted location address.
+     */
+    private String mAddressOutput;
+
+    /**
+     * Receiver registered with this activity to get the response from FetchAddressIntentService.
+     */
+    private AddressResultReceiver mResultReceiver;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,6 +115,12 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_welcome_screen);
+        mResultReceiver = new AddressResultReceiver(new Handler());
+
+        // Set defaults, then update using values stored in the Bundle.
+        mAddressRequested = false;
+        mAddressOutput = "";
+        updateValuesFromBundle(savedInstanceState);
 
         mLocationOutput= (EditText) findViewById(R.id.editTextLocationBox);
 
@@ -177,9 +206,32 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
                 requestPermissions();
             } else {
                 getLastLocation();
+                startIntentService();
             }
+            mAddressRequested = true;
+
         }
 
+    }
+
+    /**
+     * Creates an intent, adds location data to it as an extra, and starts the intent service for
+     * fetching an address.
+     */
+    private void startIntentService() {
+        // Create an intent for passing to the intent service responsible for fetching the address.
+        Intent intent = new Intent(this, FetchAddressIntentService.class);
+
+        // Pass the result receiver as an extra to the service.
+        intent.putExtra(Constants.RECEIVER, mResultReceiver);
+
+        // Pass the location data as an extra to the service.
+        intent.putExtra(Constants.LOCATION_DATA_EXTRA, mLastLocation);
+
+        // Start the service. If the service isn't already running, it is instantiated and started
+        // (creating a process for it if needed); if it is running then it remains running. The
+        // service kills itself automatically once all intents are processed.
+        startService(intent);
     }
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
@@ -189,10 +241,21 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             mLastLocation = task.getResult();
+                            if (!Geocoder.isPresent()) {
+                                showSnackbar(getString(R.string.no_geocoder_available));
+                                return;
+                            }
 
-                            mLocationOutput.setText(String.format(Locale.ENGLISH, "%s: %f",
+                            // If the user pressed the fetch address button before we had the location,
+                            // this will be set to true indicating that we should kick off the intent
+                            // service after fetching the location.
+                            if (mAddressRequested) {
+                                startIntentService();
+                            }
+
+                            /*mLocationOutput.setText(String.format(Locale.ENGLISH, "%s: %f",
                                     "Output:   ",
-                                    mLastLocation.getLongitude()));
+                                    mLastLocation.getLongitude()));**/
                         } else {
                             Log.w(TAG, "getLastLocation:exception", task.getException());
                             showSnackbar(getString(R.string.no_location_detected));
@@ -317,5 +380,56 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
         }
     }
 
+    /**
+     * Receiver for data sent from FetchAddressIntentService.
+     */
+    private class AddressResultReceiver extends ResultReceiver {
+        AddressResultReceiver(Handler handler) {
+            super(handler);
+        }
 
+        /**
+         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
+         */
+        @Override
+        protected void onReceiveResult(int resultCode, Bundle resultData) {
+
+            // Display the address string or an error message sent from the intent service.
+            mAddressOutput = resultData.getString(Constants.RESULT_DATA_KEY);
+            displayAddressOutput();
+
+            // Show a toast message if an address was found.
+            if (resultCode == Constants.SUCCESS_RESULT) {
+                //showToast(getString(R.string.address_found));
+            }
+
+            // Reset. Enable the Fetch Address button and stop showing the progress bar.
+            mAddressRequested = false;
+            //updateUIWidgets();
+        }
+    }
+
+    /**
+     * Updates fields based on data stored in the bundle.
+     */
+    private void updateValuesFromBundle(Bundle savedInstanceState) {
+        if (savedInstanceState != null) {
+            // Check savedInstanceState to see if the address was previously requested.
+            if (savedInstanceState.keySet().contains(ADDRESS_REQUESTED_KEY)) {
+                mAddressRequested = savedInstanceState.getBoolean(ADDRESS_REQUESTED_KEY);
+            }
+            // Check savedInstanceState to see if the location address string was previously found
+            // and stored in the Bundle. If it was found, display the address string in the UI.
+            if (savedInstanceState.keySet().contains(LOCATION_ADDRESS_KEY)) {
+                mAddressOutput = savedInstanceState.getString(LOCATION_ADDRESS_KEY);
+                displayAddressOutput();
+            }
+        }
+    }
+    /**
+     * Updates the address in the UI.
+     */
+    private void displayAddressOutput() {
+        mLocationOutput.setText(mAddressOutput);
+    }
 }

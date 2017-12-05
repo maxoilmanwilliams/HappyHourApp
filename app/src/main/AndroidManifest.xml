@@ -55,6 +55,10 @@
         <activity android:name=".ActivityFilter" />
         <activity android:name=".ActivitySignUp" />
         <activity android:name=".ActivityAddBar"></activity>
+
+        <service android:name=".FetchAddressIntentService"
+                    android:exported="false"/>
+
     </application>
 
 </manifest>

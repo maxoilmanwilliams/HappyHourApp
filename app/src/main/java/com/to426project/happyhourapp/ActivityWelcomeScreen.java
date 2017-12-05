@@ -233,6 +233,7 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
         // service kills itself automatically once all intents are processed.
         startService(intent);
     }
+
     @SuppressWarnings("MissingPermission")
     private void getLastLocation() {
         mFusedLocationClient.getLastLocation()

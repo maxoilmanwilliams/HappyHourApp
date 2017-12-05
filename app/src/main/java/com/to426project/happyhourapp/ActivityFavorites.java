@@ -35,6 +35,8 @@ public class ActivityFavorites extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.itemHome) {
+            Intent intentHome = new Intent(this, ActivityWelcomeScreen.class);
+            this.startActivity(intentHome);
 
         }else if (item.getItemId()==R.id.itemFavorites ){
             Intent intentFavorites = new Intent(this, ActivityFavorites.class);

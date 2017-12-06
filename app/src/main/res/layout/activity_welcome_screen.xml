@@ -19,7 +19,9 @@
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         app:bb_behavior="underNavbar"
-        app:bb_tabXmlResource="@xml/bottombar_tabs" />
+        app:bb_tabXmlResource="@xml/bottombar_tabs" >
+
+    </com.roughike.bottombar.BottomBar>
 
     <TextView
         android:id="@+id/textViewWelcome"
@@ -44,6 +46,15 @@
         android:layout_toEndOf="@+id/editTextLocationBox"
         android:layout_toRightOf="@+id/editTextLocationBox"
         android:src="@drawable/ic_nearby" />
+
+    <Button
+        android:id="@+id/buttonFindNearby"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textViewWelcome"
+        android:layout_centerHorizontal="true"
+        android:layout_weight="1"
+        android:text="Find Nearby" />
 
     <EditText
         android:id="@+id/editTextLocationBox"

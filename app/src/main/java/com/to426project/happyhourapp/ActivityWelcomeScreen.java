@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -49,10 +50,11 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
 
     private FusedLocationProviderClient mFusedLocationClient;
     protected Location mLastLocation;
+    private LatLng locCoordinates;
 
-
-    //private Button buttonGetLocation;
+    private Button buttonFindNearby;
     private ImageButton imageButtonGetLocation;
+
 
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
@@ -126,6 +128,8 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
 
         imageButtonGetLocation = (ImageButton) findViewById(R.id.imageButtonNavigation) ;
         imageButtonGetLocation.setOnClickListener(this);
+        buttonFindNearby = (Button) findViewById(R.id.buttonFindNearby);
+        buttonFindNearby.setOnClickListener(this);
 
         //Firebase
         mAuth = FirebaseAuth.getInstance();
@@ -210,6 +214,19 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
             }
             mAddressRequested = true;
 
+        }else if (view == buttonFindNearby){
+            if(locCoordinates!=null){
+                Intent newMaps = new Intent(this, ActivityMaps.class);
+                Bundle args = new Bundle();
+
+                args.putParcelable("inputLocation", locCoordinates);
+                String newInfo = mLocationOutput.getText().toString();
+                args.putString("addressDesc",newInfo);
+                newMaps.putExtra("bundle", args);
+                startActivity(newMaps);
+
+            }
+
         }
 
     }
@@ -242,6 +259,7 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             mLastLocation = task.getResult();
+                            locCoordinates = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
                             if (!Geocoder.isPresent()) {
                                 showSnackbar(getString(R.string.no_geocoder_available));
                                 return;
@@ -297,20 +315,20 @@ public class ActivityWelcomeScreen extends Activity implements View.OnClickListe
      */
     private boolean checkPermissions() {
         int permissionState = ActivityCompat.checkSelfPermission(this,
-                android.Manifest.permission.ACCESS_COARSE_LOCATION);
+                android.Manifest.permission.ACCESS_FINE_LOCATION);
         return permissionState == PackageManager.PERMISSION_GRANTED;
     }
 
     private void startLocationPermissionRequest() {
         ActivityCompat.requestPermissions(ActivityWelcomeScreen.this,
-                new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION},
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
 
     private void requestPermissions() {
         boolean shouldProvideRationale =
                 ActivityCompat.shouldShowRequestPermissionRationale(this,
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION);
+                        android.Manifest.permission.ACCESS_FINE_LOCATION);
 
         // Provide an additional rationale to the user. This would happen if the user denied the
         // request previously, but didn't check the "Don't ask again" checkbox.

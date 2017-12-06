@@ -5,31 +5,71 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
-import android.support.design.widget.BottomNavigationView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ActivityList extends Activity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private final String TAG = this.getClass().getSimpleName();
+    private ListView ListViewBars;
+    private ArrayList<BarRestaurant> list = new ArrayList<BarRestaurant>();
 
-
+    private CustomAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        ListViewBars = (ListView)findViewById(R.id.ListViewBars);
+
         mAuth = FirebaseAuth.getInstance();
+
+        final FirebaseDatabase database =FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("BarRestaurant");
+
+        myRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot dbResult : dataSnapshot.getChildren()){
+                    Log.i("barRestaurant ", dbResult.getKey());
+                    BarRestaurant barRestaurantAdd = dbResult.getValue(BarRestaurant.class);
+                    Log.i("barRestaurant variable", barRestaurantAdd.Name+"\n"+barRestaurantAdd.Description);
+                    list.add(barRestaurantAdd);
+                }
+                adapter = new CustomAdapter();
+                ListViewBars.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         final Intent intentFavorites = new Intent(this, ActivityFavorites.class);
         final Intent intentNearby = new Intent(this, ActivityList.class);
@@ -126,4 +166,38 @@ public class ActivityList extends Activity {
         }
     }
 
+    class CustomAdapter extends BaseAdapter{
+
+        @Override
+        public int getCount() {
+            Log.d(TAG, "getCount: "+ list.size());
+            return list.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            view = getLayoutInflater().inflate(R.layout.barlistlayout, null);
+
+            TextView textViewName = view.findViewById(R.id.textViewName);
+            TextView textViewLocation = view.findViewById(R.id.textViewLocation);
+            TextView textViewDescription = view.findViewById(R.id.textViewDescription);
+
+            textViewName.setText(list.get(i).Name);
+            textViewLocation.setText(list.get(i).Location);
+            textViewDescription.setText(list.get(i).Description);
+            Log.d(TAG, "getView() returned: " + textViewDescription);
+
+            return view;
+        }
+    }
 }

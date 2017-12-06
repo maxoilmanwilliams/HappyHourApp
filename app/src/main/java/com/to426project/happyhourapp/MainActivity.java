@@ -41,6 +41,7 @@ public class MainActivity extends Activity implements OnClickListener {
         buttonSignUp = (Button) findViewById(R.id.buttonSignUp);
 
         mAuth = FirebaseAuth.getInstance();
+        final Intent logInSuccessIntent = new Intent(this, ActivityWelcomeScreen.class);
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
@@ -49,6 +50,7 @@ public class MainActivity extends Activity implements OnClickListener {
                 if(user!=null){
                     //user signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in" + user.getUid());
+                    startActivity(logInSuccessIntent);
                 } else{
                     //user signed out
                     Log.d(TAG, "onAuthStateChanged:signed_out");

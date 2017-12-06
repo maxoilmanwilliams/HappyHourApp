@@ -23,11 +23,10 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar" >
 
-        <android.support.v7.widget.RecyclerView
+        <ListView
+            android:id="@+id/ListViewBars"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </android.support.v7.widget.RecyclerView>
+            android:layout_height="match_parent" />
     </FrameLayout>
     <com.roughike.bottombar.BottomBar
         android:id="@+id/bottomBar"

@@ -1,6 +1,7 @@
 package com.to426project.happyhourapp;
 
 import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
@@ -30,12 +32,13 @@ import com.roughike.bottombar.OnTabSelectListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ActivityList extends Activity {
+public class ActivityList extends Activity{
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private final String TAG = this.getClass().getSimpleName();
     private ListView ListViewBars;
     private ArrayList<BarRestaurant> list = new ArrayList<BarRestaurant>();
+    private ArrayList<String> listIDS = new ArrayList<String>();
 
     private CustomAdapter adapter;
 
@@ -43,9 +46,21 @@ public class ActivityList extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
-
+        final Intent newInfoIntent = new Intent(this, ActivityBarInfo.class);
         ListViewBars = (ListView)findViewById(R.id.ListViewBars);
+        ListViewBars.setClickable(true);
+        ListViewBars.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.i(TAG, "onItemClick: "+ list.get(i).Name);
+                Log.i(TAG, "onItemClick: "+ listIDS.get(i).toString());
 
+                Bundle args = new Bundle();
+                args.putString("childNode", listIDS.get(i).toString());
+                newInfoIntent.putExtra("bundle", args);
+                startActivity(newInfoIntent);
+            }
+        });
         mAuth = FirebaseAuth.getInstance();
 
         final FirebaseDatabase database =FirebaseDatabase.getInstance();
@@ -59,6 +74,7 @@ public class ActivityList extends Activity {
                     BarRestaurant barRestaurantAdd = dbResult.getValue(BarRestaurant.class);
                     Log.i("barRestaurant variable", barRestaurantAdd.Name+"\n"+barRestaurantAdd.Description);
                     list.add(barRestaurantAdd);
+                    listIDS.add(dbResult.getKey());
                 }
                 adapter = new CustomAdapter();
                 ListViewBars.setAdapter(adapter);
@@ -166,7 +182,9 @@ public class ActivityList extends Activity {
         }
     }
 
-    class CustomAdapter extends BaseAdapter{
+
+
+        class CustomAdapter extends BaseAdapter{
 
         @Override
         public int getCount() {

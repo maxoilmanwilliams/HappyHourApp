@@ -1,6 +1,7 @@
 package com.to426project.happyhourapp;
 
 
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -37,7 +38,7 @@ public class FragmentUpdateHappyHour extends Fragment implements View.OnClickLis
     private Button buttonStartTime, buttonEndTime, buttonSubmit, buttonCancel;
     View view;
     private static String newTime;
-    private boolean requested;
+    //private boolean requested;
     private String childNode;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -92,7 +93,7 @@ public class FragmentUpdateHappyHour extends Fragment implements View.OnClickLis
     public void onClick(View view) {
         if (view == buttonStartTime){
             Log.d("ButtonstartTime", "onClick() called with: view = [" + view + "]");
-                DialogFragment newFragment = new TimePickerFragment();
+                DialogFragment newFragment = new TimePickerFragment(textViewStartTime);
 
                 newFragment.show(getFragmentManager(),"timePicker");
 
@@ -101,7 +102,7 @@ public class FragmentUpdateHappyHour extends Fragment implements View.OnClickLis
 
         }
         else if (view == buttonEndTime){
-            DialogFragment newFragment = new TimePickerFragment();
+            DialogFragment newFragment = new TimePickerFragment(textViewEndTime);
             newFragment.show(getFragmentManager(),"timePicker");
             textViewEndTime.setText(newTime);
 
@@ -180,8 +181,18 @@ public class FragmentUpdateHappyHour extends Fragment implements View.OnClickLis
         }
     }
 
+
+
+    @SuppressLint("ValidFragment")
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
+
+        private TextView textView;
+
+        @SuppressLint("ValidFragment")
+        public TimePickerFragment(TextView textView){
+            this.textView = textView;
+        }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -194,13 +205,13 @@ public class FragmentUpdateHappyHour extends Fragment implements View.OnClickLis
             return new TimePickerDialog(getActivity(), this, hour, minute,
                     DateFormat.is24HourFormat(getActivity()));
         }
-
+        @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             // Do something with the time chosen by the user
             String hour = Integer.toString(hourOfDay);
             String mMinute = Integer.toString(minute);
             newTime = hour + " : " + mMinute;
-
+            textView.setText(newTime);
 
         }
 

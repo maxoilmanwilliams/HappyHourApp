@@ -11,6 +11,11 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar" >
 
+        <ListView
+            android:id="@+id/ListViewBars2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="true" />
     </FrameLayout>
     <com.roughike.bottombar.BottomBar
         android:id="@+id/bottomBar"

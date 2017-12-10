@@ -10,18 +10,36 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.roughike.bottombar.BottomBar;
 import com.roughike.bottombar.OnTabSelectListener;
+
+import java.util.ArrayList;
 
 public class ActivityFavorites extends Activity {
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private FirebaseUser user;
     private final String TAG = this.getClass().getSimpleName();
+
+    private ListView ListViewBars;
+    private ArrayList<BarRestaurant> list = new ArrayList<BarRestaurant>();
+    private ArrayList<String> listIDS = new ArrayList<String>();
+
+    private CustomAdapter adapter;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -65,8 +83,58 @@ public class ActivityFavorites extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favorites);
 
-        mAuth = FirebaseAuth.getInstance();
+        final Intent newInfoIntent = new Intent(this, ActivityBarInfo.class);
+        ListViewBars = findViewById(R.id.ListViewBars2);
 
+
+
+
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+        final FirebaseDatabase database =FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("user");
+        myRef.child(user.getUid()).child("Favorites").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                list.clear();
+                listIDS.clear();
+                Log.i(TAG, "onDataChange: snapshotexists? \n " +dataSnapshot.exists());
+                Log.i(TAG, "onDataChange: Listids cleared and list cleared List Size: " + list.size());
+                for (DataSnapshot dbResult : dataSnapshot.getChildren()){
+                    Log.i("barRestaurantActivity", dbResult.getKey());
+
+                    BarRestaurant barRestaurantAdd = dbResult.getValue(BarRestaurant.class);
+                    //Log.i("barRestaurant variable", barRestaurantAdd.Name+"\n"+barRestaurantAdd.Description);
+                    list.add(barRestaurantAdd);
+                    listIDS.add(dbResult.getKey());
+                    Log.i(TAG, "onDataChange: Add ID" + dbResult.getKey());
+
+
+                }
+                adapter = new CustomAdapter();
+                ListViewBars.setAdapter(adapter);
+                if (list.size()>0){
+                    ListViewBars.setClickable(true);
+                    ListViewBars.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            Log.i(TAG, "onItemClick: "+ list.get(i).Name);
+                            Log.i(TAG, "onItemClick: "+ listIDS.get(i));
+
+                            Bundle args = new Bundle();
+                            args.putString("childNode", listIDS.get(i));
+                            newInfoIntent.putExtra("bundle", args);
+                            startActivity(newInfoIntent);
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
         final Intent intentFavorites = new Intent(this, ActivityFavorites.class);
         //final Intent intentNearby = new Intent(this, ActivityList.class);
         final Intent intentEvent = new Intent(this, ActivityEvents.class);
@@ -127,4 +195,38 @@ public class ActivityFavorites extends Activity {
         }
     }
 
+    class CustomAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            Log.d(TAG, "getCount: " + list.size());
+            return list.size();
+        }
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            view = getLayoutInflater().inflate(R.layout.barlistlayout, null);
+
+            TextView textViewName = view.findViewById(R.id.textViewName);
+            TextView textViewLocation = view.findViewById(R.id.textViewLocation);
+            TextView textViewDescription = view.findViewById(R.id.textViewDescription);
+
+            textViewName.setText(list.get(i).Name);
+            textViewLocation.setText(list.get(i).Location);
+            textViewDescription.setText(list.get(i).Description);
+            Log.d(TAG, "getView() returned: " + textViewDescription);
+
+            return view;
+        }
+    }
 }

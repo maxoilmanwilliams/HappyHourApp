@@ -51,6 +51,12 @@
             android:layout_below="@+id/textViewAddress"
             android:textSize="18sp" />
 
+        <com.github.ivbaranov.mfb.MaterialFavoriteButton
+            android:id="@+id/FavButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:mfb_type="heart" />
+
         <Button
             android:id="@+id/buttonUpdateHappyHour"
             android:layout_width="match_parent"

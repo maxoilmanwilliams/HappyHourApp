@@ -70,7 +70,6 @@ public class ActivityList extends Activity{
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                //TODO Check to see if this fixes list, stops from adding records multiple times
                 list.clear();
                 listIDS.clear();
                 for (DataSnapshot dbResult : dataSnapshot.getChildren()){

@@ -53,10 +53,10 @@ public class ActivityList extends Activity{
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Log.i(TAG, "onItemClick: "+ list.get(i).Name);
-                Log.i(TAG, "onItemClick: "+ listIDS.get(i).toString());
+                Log.i(TAG, "onItemClick: "+ listIDS.get(i));
 
                 Bundle args = new Bundle();
-                args.putString("childNode", listIDS.get(i).toString());
+                args.putString("childNode", listIDS.get(i));
                 newInfoIntent.putExtra("bundle", args);
                 startActivity(newInfoIntent);
             }
@@ -69,6 +69,10 @@ public class ActivityList extends Activity{
         myRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
+                //TODO Check to see if this fixes list, stops from adding records multiple times
+                list.clear();
+                listIDS.clear();
                 for (DataSnapshot dbResult : dataSnapshot.getChildren()){
                     Log.i("barRestaurant ", dbResult.getKey());
                     BarRestaurant barRestaurantAdd = dbResult.getValue(BarRestaurant.class);

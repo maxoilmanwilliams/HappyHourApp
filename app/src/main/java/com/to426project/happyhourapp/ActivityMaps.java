@@ -1,5 +1,6 @@
 package com.to426project.happyhourapp;
 
+import android.content.Intent;
 import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -20,9 +22,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Locale;
 
-public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback {
+public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
     private LatLng inputLocation;
@@ -30,8 +35,10 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     private final String TAG = this.getClass().getSimpleName();
+    private String weekDay;
+    private String childNode;
     private ArrayList<BarRestaurant> list = new ArrayList<BarRestaurant>();
-
+    private ArrayList<String> listIDS = new ArrayList<String>();
 
 
     @Override
@@ -41,6 +48,11 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
 
         mAuth = FirebaseAuth.getInstance();
 
+        //Get name of day of week (i.e, Monday,Tuesday, etc...)
+        SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
+        Calendar calendar = Calendar.getInstance();
+        weekDay = dayFormat.format(calendar.getTime());
+
         final FirebaseDatabase database =FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("BarRestaurant");
         myRef.addValueEventListener(new ValueEventListener() {
@@ -48,10 +60,38 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot dbResult : dataSnapshot.getChildren()){
                     Log.i("barRestaurant ", dbResult.getKey());
+
                     BarRestaurant barRestaurantAdd = dbResult.getValue(BarRestaurant.class);
-                    Log.i("barRestaurant variable", barRestaurantAdd.Name+"\n"+barRestaurantAdd.Description);
-                    list.add(barRestaurantAdd);
-                    addMarkerToMap(barRestaurantAdd.Name, barRestaurantAdd.Description, barRestaurantAdd.Latitude,barRestaurantAdd.Longitude);
+                    Log.i("barRestaurant variable", barRestaurantAdd.Name+"\n"+barRestaurantAdd.Description + barRestaurantAdd.Latitude + barRestaurantAdd.Longitude);
+
+
+
+                    Boolean happyHourToday = false;
+                    String outputHappyHour="";
+                    if (dbResult.hasChild("HappyHours")){
+                        Log.i(TAG, "onDataChange: "
+                        + dbResult.hasChild("HappyHours"));
+                        if (dbResult.child("HappyHours").hasChild(weekDay)){
+                            HappyHourTime happyHourTime = dbResult.child("HappyHours").child(weekDay).getValue(HappyHourTime.class);
+                            assert happyHourTime != null;
+                            if (!happyHourTime.StartTime.isEmpty() || !happyHourTime.EndTime.isEmpty()){
+                                happyHourToday=true;
+                                String start = cleanTimeHelper(happyHourTime.StartTime);
+                                String end = cleanTimeHelper(happyHourTime.EndTime);
+                                String day = happyHourTime.DayOfWeek;
+                                outputHappyHour = day + "'s  Happy Hour : " + start + "  -  " +
+                                        end;
+                            }
+                        }
+                    }
+
+
+
+                    if (barRestaurantAdd.Latitude != null && barRestaurantAdd.Longitude != null){
+                        addMarkerToMap(barRestaurantAdd,outputHappyHour, happyHourToday);
+                        list.add(barRestaurantAdd);
+                        listIDS.add(dbResult.getKey());
+                    }
                 }
 
             }
@@ -85,7 +125,7 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
+        mMap.setOnInfoWindowClickListener(this);
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
         LatLng myLocation = new LatLng(inputLocation.latitude, inputLocation.longitude);
@@ -98,22 +138,34 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, zoomLevel));
     }
 
-    public void addMarkerToMap(String Name, String Description, Double Latitude, Double Longitude){
+    public void addMarkerToMap(BarRestaurant barRestaurant, String HappyHourString, Boolean happyHourToday){
 
 
-        LatLng pointToAdd = new LatLng(Latitude,Longitude);
+        LatLng pointToAdd = new LatLng(barRestaurant.Latitude,barRestaurant.Longitude);
         Location myLocation = new Location("Point A");
         myLocation.setLatitude(inputLocation.latitude);
         myLocation.setLongitude(inputLocation.longitude);
         Location barLocation = new Location("Point B");
-        barLocation.setLatitude(Latitude);
-        barLocation.setLongitude(Longitude);
+        barLocation.setLatitude(barRestaurant.Latitude);
+        barLocation.setLongitude(barRestaurant.Longitude);
 
         double distance = (myLocation.distanceTo(barLocation) * 0.000621371);
+        Marker marker;
+        //TODO Change map marker color?
+        if (happyHourToday){
+            marker = mMap.addMarker(new MarkerOptions().
+                    position(pointToAdd)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN))
+                    .title(barRestaurant.Name).snippet(HappyHourString));
 
-        mMap.addMarker(new MarkerOptions().
-                position(pointToAdd).
-                title(Name)).setSnippet("Distance: " + roundTwoDecimals(distance) + " miles");
+        }else{
+
+            marker=mMap.addMarker(new MarkerOptions().
+                    position(pointToAdd)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                    .title(barRestaurant.Name).snippet("Distance: " + roundTwoDecimals(distance) + " miles\n"+HappyHourString));
+        }
+
 
     }
     double roundTwoDecimals(double d)
@@ -122,4 +174,52 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
         return Double.valueOf(twoDForm.format(d));
     }
 
+    public String cleanTimeHelper(String time){
+        String splitTime[]=time.split(":");
+        String hours=splitTime[0].trim();
+        Integer iHour = Integer.parseInt(hours);
+        String minutes=splitTime[1].trim();
+        Integer iMinute = Integer.parseInt(minutes);
+
+        String timeSet = "";
+        if (iHour > 12) {
+            iHour -= 12;
+            timeSet = "PM";
+        } else if (iHour == 0) {
+            iHour += 12;
+            timeSet = "AM";
+        } else if (iHour == 12){
+            timeSet = "PM";
+        }else{
+            timeSet = "AM";
+        }
+
+        String min = "";
+        if (iMinute < 10)
+            min = "0" + minutes ;
+        else
+            min = String.valueOf(minutes);
+
+        // Append in a StringBuilder
+
+        return String.valueOf(iHour) + ':' +
+                min + " " + timeSet;
+    }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Log.i(TAG, "onInfoWindowClick: " + marker.getId() + "\n"+ marker.getTag());
+        String markerId = marker.getId();
+        String numberOnly= markerId.replaceAll("[^0-9]", "");
+        Integer whichMarker = Integer.parseInt(numberOnly);
+        Log.i(TAG, "onInfoWindowClick: whichMarker  " + (whichMarker-1)+"\n list size: "+ list.size() + "idlist size: "+ listIDS.size());
+        Log.i(TAG, "onInfoWindowClick: " + list.get(whichMarker-1).Name
+        + "\n" + listIDS.get(whichMarker-1));
+        Bundle args = new Bundle();
+        args.putString("childNode", listIDS.get(whichMarker-1));
+        Intent newInfoIntent = new Intent(this, ActivityBarInfo.class);
+        newInfoIntent.putExtra("bundle", args);
+        startActivity(newInfoIntent);
+
+    }
 }

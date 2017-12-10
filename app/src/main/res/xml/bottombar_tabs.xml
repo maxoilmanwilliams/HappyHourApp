@@ -2,18 +2,18 @@
 <tabs>
     <tab
         id="@+id/tab_nearby"
-        icon="@drawable/ic_nearby"
+        icon="@drawable/nearby_tab_icon"
         title="Nearby" />
     <tab
         id="@+id/tab_listview"
-        icon="@drawable/ic_list"
+        icon="@drawable/list_tab_icon"
         title="List" />
     <tab
         id="@+id/tab_favorites"
-        icon="@drawable/ic_favorites"
+        icon="@drawable/favorite_tab_icon"
         title="Favorites" />
     <tab
         id="@+id/tab_event"
-        icon="@drawable/ic_event"
+        icon="@drawable/event_tab_icon"
         title="Events" />
 </tabs>

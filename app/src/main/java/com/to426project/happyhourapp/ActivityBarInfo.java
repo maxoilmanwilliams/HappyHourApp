@@ -30,13 +30,14 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
     private Button buttonUpdateHappyHour;
     private String weekDay;
     private String outputHappyHour = "";
-
+    private Boolean updateShowing;
+private Fragment fragment;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bar_info);
 
-
+        fragment=null;
         //Create auth token and database ref
         mAuth = FirebaseAuth.getInstance();
         final FirebaseDatabase database =FirebaseDatabase.getInstance();
@@ -50,7 +51,7 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
         Calendar calendar = Calendar.getInstance();
         weekDay = dayFormat.format(calendar.getTime());
-
+        updateShowing=false;
 
 
 
@@ -76,8 +77,8 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
                                 String start = cleanTimeHelper(happyHourTime.StartTime);
                                 String end = cleanTimeHelper(happyHourTime.EndTime);
                                 String day = happyHourTime.DayOfWeek;
-                                outputHappyHour = new StringBuilder().append(day).append("'s  Happy Hour : ").append(start).append("  -  ")
-                                        .append(end).toString();
+                                outputHappyHour = day + "'s  Happy Hour : " + start + "  -  " +
+                                        end;
                         }else{
                             outputHappyHour= "Happy Hour: None Today";
                         }
@@ -125,24 +126,38 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
         if (view == buttonUpdateHappyHour){
             //Intent newIntent = new Intent(this, FragmentUpdateHappyHour.class);
             //startActivity(newIntent);
-            if (findViewById(R.id.fragment_container) != null) {
 
-                // However, if we're being restored from a previous state,
-                // then we don't need to do anything and should return or else
-                // we could end up with overlapping fragments.
 
-                // Create a new Fragment to be placed in the activity layout
-                FragmentUpdateHappyHour firstFragment = new FragmentUpdateHappyHour();
+                if (findViewById(R.id.fragment_container) != null) {
 
-                // In case this activity was started with special instructions from an
-                // Intent, pass the Intent's extras to the fragment as arguments
-                firstFragment.setArguments(getIntent().getExtras());
-                Log.d(TAG, "onClick: ButtonUpdateHappyHour"+ (getIntent().getExtras()));
+                    // However, if we're being restored from a previous state,
+                    // then we don't need to do anything and should return or else
+                    // we could end up with overlapping fragments.
 
-                // Add the fragment to the 'fragment_container' FrameLayout
-                getFragmentManager().beginTransaction()
-                        .add(R.id.fragment_container, firstFragment).commit();
-            }
+                    // Create a new Fragment to be placed in the activity layout
+                    FragmentUpdateHappyHour firstFragment = new FragmentUpdateHappyHour();
+                    fragment=firstFragment;
+                    // In case this activity was started with special instructions from an
+                    // Intent, pass the Intent's extras to the fragment as arguments
+                    firstFragment.setArguments(getIntent().getExtras());
+                    Log.d(TAG, "onClick: ButtonUpdateHappyHour"+ (getIntent().getExtras()));
+
+                    // Add the fragment to the 'fragment_container' FrameLayout
+                    if(!updateShowing){
+                        getFragmentManager().beginTransaction()
+                                .add(R.id.fragment_container, firstFragment).commit();
+                        updateShowing=true;
+                    }else{
+                        getFragmentManager().beginTransaction().remove(getFragmentManager().findFragmentById(R.id.fragment_container)).commit();
+                        updateShowing=false;
+
+                }
+
+
+
+                }
+
+
         }
     }
 

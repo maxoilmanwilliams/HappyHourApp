@@ -5,69 +5,97 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.to426project.happyhourapp.ActivityWelcomeScreen">
+
+    <com.roughike.bottombar.BottomBar
+        android:id="@+id/bottomBar"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentBottom="true"
+        android:addStatesFromChildren="false"
+        app:bb_behavior="underNavbar"
+        app:bb_tabXmlResource="@xml/bottombar_tabs"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+    </com.roughike.bottombar.BottomBar>
+
     <FrameLayout
         android:id="@+id/contentContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/bottomBar">
 
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/textViewWelcome"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_horizontal"
+                android:text="Welcome Screen"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/editTextLocationBox"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
+
+            <ImageButton
+                android:id="@+id/imageButtonNavigation"
+                style="@style/?android:attr/buttonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/editTextLocationBox"
+                android:layout_toEndOf="@+id/editTextLocationBox"
+                android:layout_toRightOf="@+id/editTextLocationBox"
+                android:src="@drawable/ic_nearby"
+                app:layout_constraintBottom_toBottomOf="@+id/editTextLocationBox"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/editTextLocationBox"
+                app:layout_constraintTop_toTopOf="@+id/editTextLocationBox" />
+
+            <Button
+                android:id="@+id/buttonFindNearby"
+                style="@style/AppTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/textViewWelcome"
+                android:layout_centerHorizontal="true"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_weight="1"
+                android:backgroundTint="?android:attr/colorButtonNormal"
+                android:text="Find Nearby"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/editTextLocationBox" />
+
+            <EditText
+                android:id="@+id/editTextLocationBox"
+                style="@style/AppTheme"
+                android:layout_width="wrap_content"
+                android:layout_height="55dp"
+                android:layout_alignBottom="@+id/textViewWelcome"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="8dp"
+                android:ems="10"
+                android:hint="Enter Location"
+                android:inputType="textPostalAddress"
+                app:layout_constraintEnd_toStartOf="@+id/imageButtonNavigation"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textViewWelcome" />
+
+        </android.support.constraint.ConstraintLayout>
     </FrameLayout>
-
-    <com.roughike.bottombar.BottomBar
-        android:id="@+id/bottomBar"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_alignParentBottom="true"
-        app:bb_behavior="underNavbar"
-        app:bb_tabXmlResource="@xml/bottombar_tabs" >
-
-    </com.roughike.bottombar.BottomBar>
-
-    <TextView
-        android:id="@+id/textViewWelcome"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/bottomBar"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="326dp"
-        android:gravity="center_horizontal"
-        android:text="Welcome Screen"
-        android:textStyle="bold" />
-
-    <ImageButton
-        android:id="@+id/imageButtonNavigation"
-        style="@android:style/Widget.DeviceDefault.ImageButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/editTextLocationBox"
-        android:layout_marginLeft="18dp"
-        android:layout_marginStart="18dp"
-        android:layout_toEndOf="@+id/editTextLocationBox"
-        android:layout_toRightOf="@+id/editTextLocationBox"
-        android:src="@drawable/ic_nearby" />
-
-    <Button
-        android:id="@+id/buttonFindNearby"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textViewWelcome"
-        android:layout_centerHorizontal="true"
-        android:layout_weight="1"
-        android:text="Find Nearby" />
-
-    <EditText
-        android:id="@+id/editTextLocationBox"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/textViewWelcome"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="43dp"
-        android:layout_marginLeft="21dp"
-        android:layout_marginStart="21dp"
-        android:ems="10"
-        android:hint="Enter Location"
-        android:inputType="textPostalAddress" />
 
 </RelativeLayout>

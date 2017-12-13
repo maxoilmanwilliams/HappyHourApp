@@ -81,7 +81,7 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
                         if (dbResult.child("HappyHours").hasChild(weekDay)){
                             HappyHourTime happyHourTime = dbResult.child("HappyHours").child(weekDay).getValue(HappyHourTime.class);
                             assert happyHourTime != null;
-                            if (!happyHourTime.StartTime.isEmpty() || !happyHourTime.EndTime.isEmpty()){
+                            if (happyHourTime.StartTime!=null || happyHourTime.EndTime!=null){
                                 happyHourToday=true;
                                 String start = cleanTimeHelper(happyHourTime.StartTime);
                                 String end = cleanTimeHelper(happyHourTime.EndTime);
@@ -174,11 +174,15 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
 
         }
         else{
+            try{
+                marker=mMap.addMarker(new MarkerOptions().
+                        position(pointToAdd)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+                        .title(barRestaurant.Name).snippet("Distance: " + roundTwoDecimals(distance) + " miles\n"+HappyHourString));
+            }catch (Exception exception){
+                Log.e(TAG, "addMarkerToMap: ", exception);
+            }
 
-            marker=mMap.addMarker(new MarkerOptions().
-                    position(pointToAdd)
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-                    .title(barRestaurant.Name).snippet("Distance: " + roundTwoDecimals(distance) + " miles\n"+HappyHourString));
         }
 
 

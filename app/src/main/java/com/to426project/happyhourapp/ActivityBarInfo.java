@@ -43,7 +43,6 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
     private MaterialFavoriteButton materialFavoriteButton;
     private BarRestaurant barObject;
     private Boolean initializedFavButton;
-    private Boolean happyNow;
 
     private Fragment fragment;
     @Override
@@ -104,11 +103,11 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
                     if (dataSnapshot.child("HappyHours").hasChild(weekDay)){
                         HappyHourTime happyHourTime = dataSnapshot.child("HappyHours").child(weekDay).getValue(HappyHourTime.class);
                         assert happyHourTime != null;
-                        if (!happyHourTime.StartTime.isEmpty() || !happyHourTime.EndTime.isEmpty()){
+                        if (happyHourTime.StartTime!=null || happyHourTime.EndTime!=null){
                                 String start = cleanTimeHelper(happyHourTime.StartTime);
                                 String end = cleanTimeHelper(happyHourTime.EndTime);
                                 String day = happyHourTime.DayOfWeek;
-                                happyNow= happyHourNow(happyHourTime.StartTime,happyHourTime.EndTime);
+                                happyHourToday= happyHourNow(happyHourTime.StartTime,happyHourTime.EndTime);
                                 outputHappyHour = day + "'s  Happy Hour : " + start + "  -  " +
                                         end;
                         }else{
@@ -116,7 +115,7 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
                         }
                     }
                 }
-                updateUI(barRestaurant, outputHappyHour);
+                updateUI(barRestaurant, outputHappyHour, happyHourToday);
                 barObject= barRestaurant;
 
             }
@@ -206,7 +205,7 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
 
     }
 
-    public void updateUI(BarRestaurant barRestaurant, String outputHappyHour){
+    public void updateUI(BarRestaurant barRestaurant, String outputHappyHour, Boolean happyNow){
         textViewName.setText(barRestaurant.Name);
         textViewAddress.setText(barRestaurant.Location);
         textViewHappyHour.setText(outputHappyHour);

@@ -50,7 +50,7 @@
 
             <ImageButton
                 android:id="@+id/imageButtonNavigation"
-                style="@style/?android:attr/buttonStyle"
+                style="@style/AppTheme"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@+id/editTextLocationBox"

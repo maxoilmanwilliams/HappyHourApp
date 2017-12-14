@@ -1,11 +1,15 @@
 package com.to426project.happyhourapp;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.location.Location;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -14,6 +18,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,8 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-
-public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
+public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMyLocationButtonClickListener{
 
     private GoogleMap mMap;
     private LatLng inputLocation;
@@ -41,8 +46,10 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
     private ArrayList<BarRestaurant> list = new ArrayList<BarRestaurant>();
     private ArrayList<String> listIDS = new ArrayList<String>();
     private ArrayList<Boolean> happyNowList = new ArrayList<Boolean>();
-
-
+    private Boolean locationSentInBundle;
+    private FusedLocationProviderClient mFusedLocationClient;
+    protected Location mLastLocation;
+    private LatLng locCoordinates;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +57,10 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
 
         mAuth = FirebaseAuth.getInstance();
+
+        //Location Intitialize
+        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
 
         //Get name of day of week (i.e, Monday,Tuesday, etc...)
         SimpleDateFormat dayFormat = new SimpleDateFormat("EEEE", Locale.US);
@@ -109,11 +120,26 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
 
             }
         });
+        Bundle extras = getIntent().getExtras();
+        if(extras!=null)
+        {
+            if(extras.containsKey("addressDesc")&& extras.containsKey("inputLocation"))
+            {
+                inputLocation= extras.getParcelable("inputLocation");
+                addressDesc=extras.getString("addressDesc");
+                locationSentInBundle=true;
+            }else{
+                locationSentInBundle = false;
+            }
+        }else
+        {
+            locationSentInBundle = false;
+        }
 
 
-        Bundle bundle = getIntent().getParcelableExtra("bundle");
-        inputLocation= bundle.getParcelable("inputLocation");
-        addressDesc = bundle.getString("addressDesc");
+        //Bundle bundle = getIntent().getParcelableExtra("bundle");
+        //inputLocation= bundle.getParcelable("inputLocation");
+        //addressDesc = bundle.getString("addressDesc");
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -130,20 +156,47 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+    @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         mMap.setOnInfoWindowClickListener(this);
+        mMap.setMyLocationEnabled(true);
+        mMap.setOnMyLocationButtonClickListener(this);
+
         // Add a marker in Sydney and move the camera
         //LatLng sydney = new LatLng(-34, 151);
-        LatLng myLocation = new LatLng(inputLocation.latitude, inputLocation.longitude);
-        float zoomLevel = 15.0f; //This goes up to 21
+        if (locationSentInBundle){
+            LatLng myLocation = new LatLng(inputLocation.latitude, inputLocation.longitude);
 
-        mMap.addMarker(new MarkerOptions().position(myLocation)
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
-                .title("You Are Here"))
-                .setSnippet(addressDesc);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, zoomLevel));
+
+            mMap.addMarker(new MarkerOptions().position(myLocation)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                    .title("You Are Here"))
+                    .setSnippet(addressDesc);
+            float zoomLevel = 15.0f; //This goes up to 21
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, zoomLevel));
+        }else
+        {
+            Log.i(TAG, "onMapReady: location sent in bundle false ");
+            mFusedLocationClient.getLastLocation().addOnCompleteListener(new OnCompleteListener<Location>() {
+                @Override
+                public void onComplete(@NonNull Task<Location> task) {
+                    if (task.isSuccessful() && task.getResult() != null){
+                        mLastLocation = task.getResult();
+                        inputLocation = new LatLng(mLastLocation.getLatitude(),mLastLocation.getLongitude());
+                        mMap.addMarker(new MarkerOptions().position(inputLocation)
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                                .title("You Are Here"));
+                        float zoomLevel = 15.0f; //This goes up to 21
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(inputLocation, zoomLevel));
+                    }
+                }
+            });
+                    }
+
+
+
     }
 
     public void addMarkerToMap(BarRestaurant barRestaurant, String HappyHourString, Boolean happyHourToday, Boolean happyHourNow){
@@ -277,5 +330,11 @@ public class ActivityMaps extends FragmentActivity implements OnMapReadyCallback
 
 
 
+    }
+
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        return false;
     }
 }

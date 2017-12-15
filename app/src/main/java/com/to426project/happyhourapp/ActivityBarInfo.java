@@ -125,14 +125,37 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
 
             }
         });
+        /*
         if (!initializedFavButton){
             materialFavoriteButton.setFavorite(false,false);
 
+        }**/
+        DatabaseReference userRef2 = database.getReference("user").child(user.getUid());
+        if (!initializedFavButton){
+            userRef2.child("Favorites").child(childNode).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()){
+                        materialFavoriteButton.setFavorite(true, false);
+                        initializedFavButton=true;
+                    }
+                    else
+                    {
+                        materialFavoriteButton.setFavorite(false,false);
+                        initializedFavButton=true;
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }
         materialFavoriteButton.setOnFavoriteChangeListener(new MaterialFavoriteButton.OnFavoriteChangeListener() {
             @Override
             public void onFavoriteChanged(MaterialFavoriteButton buttonView, boolean favorite) {
-                DatabaseReference userRef = database.getReference("user").child(user.getUid());
+
                 /*
                 if (favorite){
                     userRef.child("Favorites").child(childNode).setValue(barObject).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -163,28 +186,31 @@ public class ActivityBarInfo extends Activity implements View.OnClickListener{
             @Override
             public void onAnimationEnd(MaterialFavoriteButton buttonView, boolean favorite) {
                 DatabaseReference userRef = database.getReference("user").child(user.getUid());
-                if (favorite){
-                    userRef.child("Favorites").child(childNode).setValue(barObject).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                Toast.makeText(ActivityBarInfo.this, "New Favorite: \n" + barObject.Name, Toast.LENGTH_SHORT).show();
+                if (initializedFavButton){
+                    if (favorite){
+                        userRef.child("Favorites").child(childNode).setValue(barObject).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Toast.makeText(ActivityBarInfo.this, "New Favorite: \n" + barObject.Name, Toast.LENGTH_SHORT).show();
+                                }
                             }
-                        }
-                    });
+                        });
 
 
-                }else {
-                    userRef.child("Favorites").child(childNode).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()){
-                                Toast.makeText(ActivityBarInfo.this, "Favorite: " + barObject.Name + " removed", Toast.LENGTH_SHORT).show();
+                    }else {
+                        userRef.child("Favorites").child(childNode).removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()){
+                                    Toast.makeText(ActivityBarInfo.this, "Favorite: " + barObject.Name + " removed", Toast.LENGTH_SHORT).show();
 
+                                }
                             }
-                        }
-                    });
+                        });
+                    }
                 }
+
             }
         });
 
